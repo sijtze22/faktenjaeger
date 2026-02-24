@@ -25,15 +25,11 @@
         body { font-family:system-ui,sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
         header { background:linear-gradient(135deg,#1e1e1e,#252525); padding:12px 16px; border-bottom:2px solid var(--gold); position:sticky; top:0; z-index:100; text-align:center; }
         h1 { font-size:1.4rem; margin:4px 0; }
-        .politician-header { display:flex; align-items:center; justify-content:center; gap:10px; margin:8px 0; }
-        .politician-photo { width:48px; height:48px; border-radius:50%; object-fit:cover; border:2px solid var(--gold); }
-        select { background:var(--bg); color:var(--text); border:2px solid var(--gold); padding:8px; border-radius:8px; font-size:0.95rem; cursor:pointer; width:200px; }
-        .option-with-circle { display:flex; align-items:center; gap:8px; }
-        .status-circles { display:flex; gap:4px; }
-        .circle { width:12px; height:12px; border-radius:50%; border:1px solid #444; }
-        .red-circle { background:var(--red); }
-        .yellow-circle { background:var(--yellow); }
-        .green-circle { background:var(--green); }
+        .politician-header { display:flex; align-items:center; justify-content:center; gap:12px; margin:8px 0; }
+        .pie-header { width:80px; height:80px; position:relative; border-radius:50%; overflow:hidden; }
+        .pie-small { width:20px; height:20px; position:relative; display:inline-block; border-radius:50%; overflow:hidden; }
+        select { background:var(--bg); color:var(--text); border:2px solid var(--gold); padding:8px; border-radius:8px; font-size:0.95rem; cursor:pointer; width:240px; }
+        .option-with-pie { display:flex; align-items:center; gap:10px; }
         main { padding:12px; max-width:1200px; margin:0 auto; }
         .swipe-container { overflow:hidden; touch-action:pan-y; }
         .swipe-track { display:flex; transition:transform 0.4s ease; }
@@ -115,7 +111,7 @@
 
     <script>
         const cardData = [
-            // Merz 10 (same as before)
+            // Merz 10 cards (same as before)
             {id:"merz-1", politician:"merz", name:"Friedrich Merz", photo:"https://upload.wikimedia.org/wikipedia/commons/7/7f/Friedrich_Merz_2025.jpg",
              datePromise:"2025-01", promise:"Keine Aufweichung der Schuldenbremse.", promiseSource:"https://www.cdu.de/wahlprogramm-von-cdu-und-csu/",
              dateReality:"2025-03-18", reality:"500 Mrd. € Sondervermögen außerhalb der Bremse.", realitySource:"https://www.tagesschau.de/inland/bundestag-finanzpaket-100.html", status:"nicht_umgesetzt",
@@ -145,7 +141,7 @@
 
             // Karl Lauterbach – 10 Karten
             {id:"lauterbach-1", politician:"lauterbach", name:"Karl Lauterbach", photo:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/Karl_Lauterbach_2021.jpg/800px-Karl_Lauterbach_2021.jpg",
-             datePromise:"2021 Wahlkampf", promise:"Kurze und zielgerichtete Corona-Maßnahmen.", promiseSource:"https://www.bundesgesundheitsministerium.de/corona-massnahmen-2021",
+             datePromise:"2021", promise:"Kurze und zielgerichtete Corona-Maßnahmen.", promiseSource:"https://www.bundesgesundheitsministerium.de/corona-massnahmen-2021",
              dateReality:"2022", reality:"Maßnahmen zogen sich monatelang hin.", realitySource:"https://www.tagesschau.de/inland/corona-massnahmen-2022", status:"nicht_umgesetzt",
              details:"Lauterbach versprach 2021 kurze und evidenzbasierte Maßnahmen. Viele Einschränkungen dauerten deutlich länger als angekündigt. Dies führte zu heftigen Debatten über die Dauer der Corona-Politik."}
             // ... (Lauterbach 2-10 same as previous)
@@ -164,32 +160,68 @@
         const updateInfo = document.getElementById('updateInfo');
         const toastContainer = document.getElementById('toastContainer');
 
-        // Add status circles to dropdown options
-        function addStatusCircles(option, politician) {
-            const stats = cardData.filter(c => c.politician === politician);
-            const total = stats.length;
-            const nicht = stats.filter(c => c.status === 'nicht_umgesetzt').length;
-            const eingehalten = stats.filter(c => c.status === 'eingehalten').length;
-            const teilweise = stats.filter(c => c.status === 'teilweise_umgesetzt').length;
+        // Calculate percentages and create pie chart
+        function createPieChart(pctRed, pctYellow, pctGreen, size = 18) {
+            const container = document.createElement('div');
+            container.style.width = `${size}px`;
+            container.style.height = `${size}px`;
+            container.style.position = 'relative';
+            container.style.borderRadius = '50%';
+            container.style.overflow = 'hidden';
+            container.style.border = '1px solid #444';
 
-            const redPct = Math.round((nicht / total) * 100);
-            const greenPct = Math.round((eingehalten / total) * 100);
-            const yellowPct = Math.round((teilweise / total) * 100);
+            let offset = 0;
+            if (pctRed > 0) {
+                const slice = document.createElement('div');
+                slice.style.position = 'absolute';
+                slice.style.width = '100%';
+                slice.style.height = '100%';
+                slice.style.background = `conic-gradient(var(--red) 0% ${pctRed}%, transparent ${pctRed}% 100%)`;
+                container.appendChild(slice);
+                offset += pctRed;
+            }
+            if (pctYellow > 0) {
+                const slice = document.createElement('div');
+                slice.style.position = 'absolute';
+                slice.style.width = '100%';
+                slice.style.height = '100%';
+                slice.style.background = `conic-gradient(var(--yellow) ${offset}% ${offset + pctYellow}%, transparent ${offset + pctYellow}% 100%)`;
+                container.appendChild(slice);
+                offset += pctYellow;
+            }
+            if (pctGreen > 0) {
+                const slice = document.createElement('div');
+                slice.style.position = 'absolute';
+                slice.style.width = '100%';
+                slice.style.height = '100%';
+                slice.style.background = `conic-gradient(var(--green) ${offset}% ${offset + pctGreen}%, transparent ${offset + pctGreen}% 100%)`;
+                container.appendChild(slice);
+            }
 
-            const circles = document.createElement('span');
-            circles.className = 'status-circles';
-            if (redPct > 0) circles.innerHTML += `<span class="circle red-circle" title="${redPct}% nicht umgesetzt"></span>`;
-            if (yellowPct > 0) circles.innerHTML += `<span class="circle yellow-circle" title="${yellowPct}% teilweise"></span>`;
-            if (greenPct > 0) circles.innerHTML += `<span class="circle green-circle" title="${greenPct}% eingehalten"></span>`;
-
-            option.appendChild(circles);
+            return container;
         }
 
-        // Populate dropdown with circles
+        // Populate dropdown with pie charts
         window.onload = () => {
             const options = select.options;
-            for (let i = 1; i < options.length; i++) { // skip "Alle"
-                addStatusCircles(options[i], options[i].value);
+            for (let i = 1; i < options.length; i++) {
+                const politician = options[i].value;
+                const stats = cardData.filter(c => c.politician === politician);
+                const total = stats.length || 1;
+                const nicht = stats.filter(c => c.status === 'nicht_umgesetzt').length;
+                const eingehalten = stats.filter(c => c.status === 'eingehalten').length;
+                const teilweise = stats.filter(c => c.status === 'teilweise_umgesetzt').length;
+
+                const pctRed = (nicht / total) * 100;
+                const pctGreen = (eingehalten / total) * 100;
+                const pctYellow = (teilweise / total) * 100;
+
+                const pie = createPieChart(pctRed, pctYellow, pctGreen, 20);
+                const span = document.createElement('span');
+                span.style.display = 'inline-flex';
+                span.style.alignItems = 'center';
+                span.appendChild(pie);
+                options[i].appendChild(span);
             }
             renderCards();
             updateHeader();
@@ -207,11 +239,21 @@
         };
 
         function updateHeader() {
+            headerPhoto.innerHTML = '';
             if (currentPolitician !== 'all' && filteredCards.length) {
                 const c = filteredCards[0];
-                headerPhoto.innerHTML = `<img src="${c.photo}" class="politician-photo" alt="${c.name}"><span class="name">${c.name}</span>`;
-            } else {
-                headerPhoto.innerHTML = '';
+                const stats = cardData.filter(x => x.politician === currentPolitician);
+                const total = stats.length || 1;
+                const nicht = stats.filter(x => x.status === 'nicht_umgesetzt').length;
+                const eingehalten = stats.filter(x => x.status === 'eingehalten').length;
+                const teilweise = stats.filter(x => x.status === 'teilweise_umgesetzt').length;
+
+                const pctRed = (nicht / total) * 100;
+                const pctGreen = (eingehalten / total) * 100;
+                const pctYellow = (teilweise / total) * 100;
+
+                const pie = createPieChart(pctRed, pctYellow, pctGreen, 80);
+                headerPhoto.innerHTML = `<div style="display:flex; align-items:center; gap:12px;">${pie.outerHTML}<span class="name">${c.name}</span></div>`;
             }
         }
 
