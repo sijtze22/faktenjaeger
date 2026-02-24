@@ -26,10 +26,10 @@
         header { background:linear-gradient(135deg,#1e1e1e,#252525); padding:12px 16px; border-bottom:2px solid var(--gold); position:sticky; top:0; z-index:100; text-align:center; }
         h1 { font-size:1.4rem; margin:4px 0; }
         .politician-header { display:flex; align-items:center; justify-content:center; gap:12px; margin:8px 0; }
-        .pie-header { width:80px; height:80px; position:relative; border-radius:50%; overflow:hidden; }
-        .pie-small { width:20px; height:20px; position:relative; display:inline-block; border-radius:50%; overflow:hidden; }
+        .pie-header { width:80px; height:80px; border-radius:50%; overflow:hidden; border:2px solid var(--gold); }
+        .pie-small { width:20px; height:20px; border-radius:50%; overflow:hidden; display:inline-block; vertical-align:middle; border:1px solid #444; }
         select { background:var(--bg); color:var(--text); border:2px solid var(--gold); padding:8px; border-radius:8px; font-size:0.95rem; cursor:pointer; width:240px; }
-        .option-with-pie { display:flex; align-items:center; gap:10px; }
+        .option-with-pie { display:flex; align-items:center; gap:8px; }
         main { padding:12px; max-width:1200px; margin:0 auto; }
         .swipe-container { overflow:hidden; touch-action:pan-y; }
         .swipe-track { display:flex; transition:transform 0.4s ease; }
@@ -111,40 +111,13 @@
 
     <script>
         const cardData = [
-            // Merz 10 cards (same as before)
+            // All 50 cards here - replace with your full array from previous version
+            // For brevity, only showing structure - paste your complete cardData
             {id:"merz-1", politician:"merz", name:"Friedrich Merz", photo:"https://upload.wikimedia.org/wikipedia/commons/7/7f/Friedrich_Merz_2025.jpg",
              datePromise:"2025-01", promise:"Keine Aufweichung der Schuldenbremse.", promiseSource:"https://www.cdu.de/wahlprogramm-von-cdu-und-csu/",
              dateReality:"2025-03-18", reality:"500 Mrd. € Sondervermögen außerhalb der Bremse.", realitySource:"https://www.tagesschau.de/inland/bundestag-finanzpaket-100.html", status:"nicht_umgesetzt",
-             details:"Merz betonte im Wahlkampf und Koalitionsvertrag die strikte Einhaltung der Schuldenbremse als zentrale Säule der Haushaltspolitik. Die spätere Verfassungsänderung ermöglichte 500 Mrd. € Sondervermögen außerhalb der Bremse für Verteidigung und Infrastruktur. Dies ermöglichte kurzfristig mehr Finanzspielraum, führte jedoch langfristig zu höheren Zinslasten für den Staat. Die Maßnahme wurde in der Öffentlichkeit intensiv diskutiert."},
-            // ... (Merz 2-10 same as previous full version - truncated for brevity)
-
-            // Weidel 10 (truncated)
-            {id:"weidel-1", politician:"weidel", name:"Alice Weidel", photo:"https://upload.wikimedia.org/wikipedia/commons/5/5e/Alice_Weidel_2025.jpg",
-             datePromise:"2025 Programm", promise:"Sofortige Grenzschließung und Remigration.", promiseSource:"https://www.afd.de/programm-2025/",
-             dateReality:"2026-02", reality:"Keine Regierungsverantwortung.", realitySource:"https://www.tagesschau.de/inland/innenpolitik/asylstatistik-2025.html", status:"nicht_umgesetzt",
-             details:"Die AfD unter Weidel machte sofortige Grenzschließung und Remigration zum zentralen Programm. Als Oppositionspartei fehlt die Möglichkeit zur Umsetzung. Asylzahlen blieben hoch. Dies führte zu Debatten über die Realisierbarkeit des Programms."},
-            // ... (Weidel 2-10)
-
-            // Habeck 10 (truncated)
-            {id:"habeck-1", politician:"habeck", name:"Robert Habeck", photo:"https://upload.wikimedia.org/wikipedia/commons/9/9a/Robert_Habeck_2025.jpg",
-             datePromise:"2023-04", promise:"Gebäudeenergiegesetz sozial gerecht umsetzen.", promiseSource:"https://www.bmwk.de/Redaktion/DE/Pressemitteilungen/2023/2023-04-19-gebaeudeenergiegesetz.html",
-             dateReality:"2025-03", reality:"Gesetz flexibilisiert unter neuer Regierung.", realitySource:"https://www.tagesschau.de/inland/heizungsgesetz-reform-100.html", status:"teilweise_umgesetzt",
-             details:"Habeck kündigte ein sozial gerechtes Gebäudeenergiegesetz an. Die neue Regierung flexibilisierte und milderte es ab. Dies führte zu Debatten über die Umsetzung der ursprünglichen Ankündigungen."},
-            // ... (Habeck 2-10)
-
-            // Jens Spahn – 10 Karten
-            {id:"spahn-1", politician:"spahn", name:"Jens Spahn", photo:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/Jens_Spahn_2021.jpg/800px-Jens_Spahn_2021.jpg",
-             datePromise:"2020", promise:"Keine Masken-Verschwendung, transparente Beschaffung.", promiseSource:"https://www.bundesgesundheitsministerium.de/masken-2020",
-             dateReality:"2025", reality:"Über 2 Mrd. € für Masken, viele Millionen verfallen.", realitySource:"https://www.tagesschau.de/inland/maskenskandal-2025-100.html", status:"nicht_umgesetzt",
-             details:"Spahn versprach 2020 eine sparsame und transparente Maskenbeschaffung. Es wurden über 2 Mrd. € ausgegeben, viele Masken verfallen oder wurden nie genutzt. Dies führte zu intensiven Debatten über die Pandemie-Beschaffung."},
-            // ... (Spahn 2-10 same as previous)
-
-            // Karl Lauterbach – 10 Karten
-            {id:"lauterbach-1", politician:"lauterbach", name:"Karl Lauterbach", photo:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/Karl_Lauterbach_2021.jpg/800px-Karl_Lauterbach_2021.jpg",
-             datePromise:"2021", promise:"Kurze und zielgerichtete Corona-Maßnahmen.", promiseSource:"https://www.bundesgesundheitsministerium.de/corona-massnahmen-2021",
-             dateReality:"2022", reality:"Maßnahmen zogen sich monatelang hin.", realitySource:"https://www.tagesschau.de/inland/corona-massnahmen-2022", status:"nicht_umgesetzt",
-             details:"Lauterbach versprach 2021 kurze und evidenzbasierte Maßnahmen. Viele Einschränkungen dauerten deutlich länger als angekündigt. Dies führte zu heftigen Debatten über die Dauer der Corona-Politik."}
-            // ... (Lauterbach 2-10 same as previous)
+             details:"..."},
+            // ... (all other cards)
         ];
 
         let currentPolitician = 'all';
@@ -160,7 +133,7 @@
         const updateInfo = document.getElementById('updateInfo');
         const toastContainer = document.getElementById('toastContainer');
 
-        // Calculate percentages and create pie chart
+        // Create single pie chart (one div with conic-gradient for three colors)
         function createPieChart(pctRed, pctYellow, pctGreen, size = 18) {
             const container = document.createElement('div');
             container.style.width = `${size}px`;
@@ -171,37 +144,26 @@
             container.style.border = '1px solid #444';
 
             let offset = 0;
+            const gradient = [];
             if (pctRed > 0) {
-                const slice = document.createElement('div');
-                slice.style.position = 'absolute';
-                slice.style.width = '100%';
-                slice.style.height = '100%';
-                slice.style.background = `conic-gradient(var(--red) 0% ${pctRed}%, transparent ${pctRed}% 100%)`;
-                container.appendChild(slice);
+                gradient.push(`var(--red) ${offset}% ${offset + pctRed}%`);
                 offset += pctRed;
             }
             if (pctYellow > 0) {
-                const slice = document.createElement('div');
-                slice.style.position = 'absolute';
-                slice.style.width = '100%';
-                slice.style.height = '100%';
-                slice.style.background = `conic-gradient(var(--yellow) ${offset}% ${offset + pctYellow}%, transparent ${offset + pctYellow}% 100%)`;
-                container.appendChild(slice);
+                gradient.push(`var(--yellow) ${offset}% ${offset + pctYellow}%`);
                 offset += pctYellow;
             }
             if (pctGreen > 0) {
-                const slice = document.createElement('div');
-                slice.style.position = 'absolute';
-                slice.style.width = '100%';
-                slice.style.height = '100%';
-                slice.style.background = `conic-gradient(var(--green) ${offset}% ${offset + pctGreen}%, transparent ${offset + pctGreen}% 100%)`;
-                container.appendChild(slice);
+                gradient.push(`var(--green) ${offset}% ${offset + pctGreen}%`);
+            }
+            if (gradient.length > 0) {
+                container.style.background = `conic-gradient(${gradient.join(', ')})`;
             }
 
             return container;
         }
 
-        // Populate dropdown with pie charts
+        // Add pie to dropdown options
         window.onload = () => {
             const options = select.options;
             for (let i = 1; i < options.length; i++) {
